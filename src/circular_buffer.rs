@@ -11,10 +11,8 @@ use windows::Win32::{
     },
 };
 
-use crate::ring_buffer;
-
 #[derive(Debug)]
-pub struct RingBuffer {
+pub struct CircularBuffer {
     base: *mut u8,
     size: usize,
     head: usize,
@@ -22,7 +20,7 @@ pub struct RingBuffer {
 }
 
 #[allow(dead_code)]
-impl RingBuffer {
+impl CircularBuffer {
     pub fn new(size: usize) -> windows::core::Result<Self> {
         unsafe {
             let mut size = size;
@@ -143,7 +141,7 @@ impl RingBuffer {
     }
 }
 
-impl Drop for RingBuffer {
+impl Drop for CircularBuffer {
     fn drop(&mut self) {
         unsafe {
             if self.base != null_mut() {
@@ -158,7 +156,7 @@ impl Drop for RingBuffer {
     }
 }
 
-impl std::io::Write for RingBuffer {
+impl std::io::Write for CircularBuffer {
     fn write(self: &mut Self, buffer: &[u8]) -> std::io::Result<usize> {
         let head = self.head;
         let tail = self.tail;
@@ -185,7 +183,7 @@ impl std::io::Write for RingBuffer {
     }
 }
 
-impl std::io::Read for RingBuffer {
+impl std::io::Read for CircularBuffer {
     fn read(self: &mut Self, buf: &mut [u8]) -> std::io::Result<usize> {
         let bytes_to_read = if self.is_full() {
             self.size % buf.len()
@@ -203,7 +201,7 @@ impl std::io::Read for RingBuffer {
 fn test_ring_buffer_write() {
     let test_str = b"0123456789ABCDEF";
     let ring_buffer_size = 64 * 1024;
-    let mut ring_buffer = RingBuffer::new(ring_buffer_size).unwrap();
+    let mut ring_buffer = CircularBuffer::new(ring_buffer_size).unwrap();
 
     for _ in 0..16 * 1024 {
         std::io::Write::write(&mut ring_buffer, test_str)

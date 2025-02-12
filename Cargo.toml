@@ -1,7 +1,13 @@
 [package]
-name = "curciler_buffer"
+name = "circular_buffer"
 version = "0.1.0"
 edition = "2021"
+authors = ["PaNDa2code moaaz0688@gmail.com"]
+description = "A high-performance memory-mapped circular buffer for Windows systems."
+
+[lib]
+name = "ring_buffer"
+path = "src/circular_buffer.rs"
 
 [dependencies]
 windows = { version = "0.59.0", features = ["Win32_System_Memory", "Win32_System_SystemInformation", "Win32_Security"] }
